@@ -213,7 +213,7 @@ app.post("/solve", async (req, res) => {
 
         ]);
 
-        const solveTime = Date.now() - start;
+                const solveTime = ((Date.now() - start) / 1000).toFixed(2);
 
         try {
 
@@ -223,12 +223,12 @@ app.post("/solve", async (req, res) => {
 
         return res.json({
             ...result,
-            solveTime: `${solveTime} ms`
+            solveTime: `${solveTime} s`
         });
 
     } catch (err) {
 
-        const solveTime = Date.now() - start;
+        const solveTime = ((Date.now() - start) / 1000).toFixed(2);
 
         if (page) {
 
@@ -243,8 +243,10 @@ app.post("/solve", async (req, res) => {
         return res.status(500).json({
             success: false,
             message: err.message,
-            solveTime: `${solveTime} ms`
+            solveTime: `${solveTime} s`
         });
+
+    }
 
     }
 
