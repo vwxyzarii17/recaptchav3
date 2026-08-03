@@ -8,6 +8,6 @@
   },
   "dependencies": {
     "express": "^4.21.2",
-    "puppeteer-real-browser": "^1.4.6"
+    "puppeteer-real-browser": "^1.4.4"
   }
 }
