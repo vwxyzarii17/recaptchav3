@@ -1,4 +1,4 @@
-async function recaptchaV3({ domain, siteKey, action = "login" }, page) {
+async function recaptchaV3({ domain, siteKey, action }, page) {
 
     if (!domain)
         throw new Error("Missing domain parameter");
@@ -6,46 +6,66 @@ async function recaptchaV3({ domain, siteKey, action = "login" }, page) {
     if (!siteKey)
         throw new Error("Missing siteKey parameter");
 
-    const timeout = global.timeOut || 120000;
+    const timeout = 120000;
 
-    await page.goto(domain, {
-        waitUntil: "domcontentloaded"
-    });
+    return new Promise(async (resolve, reject) => {
 
-    await page.addScriptTag({
-        url: `https://www.google.com/recaptcha/api.js?render=${siteKey}`
-    });
+        let finished = false;
 
-    const token = await Promise.race([
+        const timer = setTimeout(() => {
 
-        page.evaluate(async (siteKey, action) => {
+            if (!finished) {
+                finished = true;
+                reject(new Error("Timeout Error"));
+            }
 
-            await new Promise(resolve => grecaptcha.ready(resolve));
+        }, timeout);
 
-            return grecaptcha.execute(siteKey, {
-                action
+        try {
+
+            await page.goto(domain, {
+                waitUntil: "domcontentloaded"
             });
 
-        }, siteKey, action),
+            await page.addScriptTag({
+                url: `https://www.google.com/recaptcha/api.js?render=${siteKey}`
+            });
 
-        new Promise((_, reject) => {
+            const token = await page.evaluate(async (siteKey, action) => {
 
-            setTimeout(() => {
-                reject(new Error("Timeout Error"));
-            }, timeout);
+                await new Promise(resolve => grecaptcha.ready(resolve));
 
-        })
+                return grecaptcha.execute(siteKey, {
+                    action: action || "login"
+                });
 
-    ]);
+            }, siteKey, action);
 
-    if (!token || typeof token !== "string" || token.length < 10)
-        throw new Error("Failed to get token");
+            clearTimeout(timer);
 
-    return {
-        success: true,
-        type: "recaptcha3",
-        token
-    };
+            if (!token || token.length < 10)
+                throw new Error("Failed to get token");
+
+            finished = true;
+
+            resolve({
+                success: true,
+                type: "recaptcha3",
+                token
+            });
+
+        } catch (err) {
+
+            clearTimeout(timer);
+
+            if (!finished) {
+                finished = true;
+                reject(err);
+            }
+
+        }
+
+    });
 
 }
 
