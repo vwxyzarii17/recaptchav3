@@ -5,6 +5,7 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 RUN apt-get update && apt-get install -y \
     chromium \
+    xvfb \
     fonts-liberation \
     libatk-bridge2.0-0 \
     libatk1.0-0 \
