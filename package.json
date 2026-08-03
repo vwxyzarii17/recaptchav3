@@ -1,0 +1,13 @@
+{
+  "name": "recaptcha-v3-api",
+  "version": "1.0.0",
+  "description": "reCAPTCHA v3 Solver API",
+  "main": "API.js",
+  "scripts": {
+    "start": "node API.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "puppeteer-real-browser": "^1.4.6"
+  }
+}
