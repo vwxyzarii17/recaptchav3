@@ -246,7 +246,7 @@ app.post("/solve", async (req, res) => {
             solveTime: `${solveTime} s`
         });
 
-    }
+    
 
     }
 
